@@ -1,117 +1,123 @@
-The content below is an example project proposal / requirements document. Replace the text below the lines marked "__TODO__" with details specific to your project. Remove the "TODO" lines.
-
-(__TODO__: your project name)
-
-# Shoppy Shoperson 
+# ApplyTrackify
 
 ## Overview
 
-(__TODO__: a brief one or two paragraph, high-level description of your project)
+ApplyTrackify is a web app that will allow users to keep track of multiple application lists. Users can register and login. Once they're logged in, they can see the closest deadlines and create or view their application list. For every list that they have, they can edit or delete the tracker table.
 
-Remembering what to buy at the grocery store is waaaaay too difficult. Also, shopping for groceries when you're hungry leads to regrettable purchases. Sooo... that's where Shoppy Shoperson comes in!
-
-Shoppy Shoperson is a web app that will allow users to keep track of multiple grocery lists. Users can register and login. Once they're logged in, they can create or view their grocery list. For every list that they have, they can add items to the list or cross off items.
-
+ApplyTrackify is designed to simplify the lives of users by providing them with a structured and intuitive interface to monitor the progress of their applications, deadlines, submission statuses, and any specific requirements or notes associated with each application. ApplyTrackify ensures that users can efficiently organize their application efforts, avoid missing critical deadlines, and maintain an overview of all necessary application components at a glance.
 
 ## Data Model
 
-(__TODO__: a description of your application's data and their relationships to each other) 
+The application will store Users, Graduate Program Tracker Lists, and Graduate Program Trackers.
 
-The application will store Users, Lists and Items
-
-* users can have multiple lists (via references)
-* each list can have multiple items (by embedding)
-
-(__TODO__: sample documents)
+* users can have multiple graduate tracker lists (via references)
+* each graduate tracker list can have multiple graduate trackers (via references)
 
 An Example User:
 
 ```javascript
 {
-  username: "shannonshopper",
+  username: "userExample",
   hash: // a password hash,
-  lists: // an array of references to List documents
+  email: "user@example.com", // user email
+  graduateProgramTrackerLists: // an array of references to Graduate Program Tracker List documents
+  jobTrackerLists: // an array of references to Job Tracker List documents
 }
 ```
-
-An Example List with Embedded Items:
+An Example Graduate Program Tracker List:
 
 ```javascript
 {
   user: // a reference to a User object
-  name: "Breakfast foods",
-  items: [
-    { name: "pancakes", quantity: "9876", checked: false},
-    { name: "ramen", quantity: "2", checked: true},
-  ],
-  createdAt: // timestamp
+  name: "25Fall CS Master",
+  graduateTrackers: // an array of references to Graduate Tracker documents
 }
 ```
 
+An Example Graduate Program Tracker:
+
+```javascript
+{
+  graduatetrackerList: // a reference to a Graduate Program Tracker List object
+  university: "New York University",
+  program: "MSCS",
+  deadline: "2024-03-01", 
+  submissionStatus: "Submitted", 
+  applicationStatus: "Accepted",
+  url: "https://apply.gsas.nyu.edu/apply/",
+  requirements: "3 letters of recommendation, TOEFL 100, GRE optional", 
+  memo: "Need to follow up on recommendation letters", 
+}
+```
 
 ## [Link to Commented First Draft Schema](db.mjs) 
 
-(__TODO__: create a first draft of your Schemas in db.mjs and link to it)
-
 ## Wireframes
 
-(__TODO__: wireframes for all of the pages on your site; they can be as simple as photos of drawings or you can use a tool like Balsamiq, Omnigraffle, etc.)
+/login - page for login
+![login](documentation/login.jpg)
 
-/list/create - page for creating a new shopping list
+/register - page for register
+![register](documentation/register.jpg)
 
-![list create](documentation/list-create.png)
+/verify-email - page for email verification (when the user register successfully)
+![verify-email](documentation/verify-email.jpg)
 
-/list - page for showing all shopping lists
+/dashboard - the main page that the user can see after logging in, where the user can create new tracker lists and view existing lists
+![dashboard](documentation/dashboard.jpg)
 
-![list](documentation/list.png)
+/dashboard/create - page for creating a new tracker list
+![create-list](documentation/create-list.jpg)
 
-/list/slug - page for showing specific shopping list
+/dashboard/slug-for-list - page for showing specific tracker list
+![dashboard-slug-list](documentation/dashboard-slug-list.jpg)
 
-![list](documentation/list-slug.png)
+/dashboard/slug-for-list/slug-for-tracker/edit - page for editing specific tracker of specific tracker list
+![edit-tracker](documentation/edit-tracker.jpg)
+
+/dashboard/slug-for-list/create-tracker - page for creating a new tracker of specific tracker list
+![create-tracker](documentation/create-tracker.jpg)
 
 ## Site map
 
-(__TODO__: draw out a site map that shows how pages are related to each other)
-
-Here's a [complex example from wikipedia](https://upload.wikimedia.org/wikipedia/commons/2/20/Sitemap_google.jpg), but you can create one without the screenshots, drop shadows, etc. ... just names of pages and where they flow to.
+![site-map](documentation/site-map.jpg)
 
 ## User Stories or Use Cases
 
-(__TODO__: write out how your application will be used through [user stories](http://en.wikipedia.org/wiki/User_story#Format) and / or [use cases](https://en.wikipedia.org/wiki/Use_case))
-
-1. as non-registered user, I can register a new account with the site
+1. as non-registered user, I can register a new account and verify the email
 2. as a user, I can log in to the site
-3. as a user, I can create a new grocery list
-4. as a user, I can view all of the grocery lists I've created in a single list
-5. as a user, I can add items to an existing grocery list
-6. as a user, I can cross off items in an existing grocery list
+3. as a user, I can create a new tracker list 
+4. as a user, I can view all of the tracker lists I've created
+5. as a user, I can add graduate trackers to an existing graduate tracker list
+6. as a user, I can see the recent deadline in the user's main page
+7. as a user, I can edit or delete each trackers I created
+8. as a user, I can receive an email remainder right before the deadline
 
 ## Research Topics
 
-(__TODO__: the research topics that you're planning on working on along with their point values... and the total points of research topics listed)
+* (5 points) Passport for User Authentication
+    * Passport is a flexible and modular authentication middleware for Node.js that can be easily dropped into any Express-based web application.
+    * Using Passport for user authentication provides a secure and scalable way to handle user sign-ins, registrations, and access controls.
+    * Possible candidate modules or solutions:
+      * passport-local: For username and password authentication.
+      * passport-local-mongoose: For Mongoose integration, providing easy-to-use methods for user registration, password hashing, and more.
+* (2 points) Bootstrap
+    * Bootstrap is a popular front-end framework for developing responsive and mobile-first websites.
+    * Bootstrap is chosen for its extensive component library and responsive design features, which significantly speed up the development process.
+    * Possible candidate modules or solutions: The core Bootstrap framework for CSS and JavaScript components.
+* (5 points) Nodemailer for Email Verification and Reminders
+    * Nodemailer is a module for Node.js applications to send emails easily. It supports various transport methods, including SMTP, and can be integrated into server-side logic to automate the process of sending emails from within an application.
+    * Nodemailer is chosen for its flexibility and ease of use in sending automated emails, such as reminders or notifications, directly from the server. 
+    * I think it's a challenging library to learn, so I've assigned it 5 points.
+    * Possible candidate modules or solutions: nodemailer as the primary module for email sending functionality.
 
-* (5 points) Integrate user authentication
-    * I'm going to be using passport for user authentication
-    * And account has been made for testing; I'll email you the password
-    * see <code>cs.nyu.edu/~jversoza/ait-final/register</code> for register page
-    * see <code>cs.nyu.edu/~jversoza/ait-final/login</code> for login page
-* (4 points) Perform client side form validation using a JavaScript library
-    * see <code>cs.nyu.edu/~jversoza/ait-final/my-form</code>
-    * if you put in a number that's greater than 5, an error message will appear in the dom
-* (5 points) vue.js
-    * used vue.js as the frontend framework; it's a challenging library to learn, so I've assigned it 5 points
-
-10 points total out of 8 required points (___TODO__: addtional points will __not__ count for extra credit)
+11 points total out of 10 required points 
 
 
 ## [Link to Initial Main Project File](app.mjs) 
 
-(__TODO__: create a skeleton Express application with a package.json, app.mjs, views folder, etc. ... and link to your initial app.mjs)
-
 ## Annotations / References Used
 
-(__TODO__: list any tutorials/references/etc. that you've based your code off of)
-
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
-
+1. [passport.js authentication docs](https://www.passportjs.org/tutorials/password/)
+2. [Nodemailer](https://www.nodemailer.com/about/)
+3. [Bootstrap] (https://getbootstrap.com/)
