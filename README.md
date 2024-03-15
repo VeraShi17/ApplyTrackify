@@ -21,7 +21,6 @@ An Example User:
   hash: // a password hash,
   email: "user@example.com", // user email
   graduateProgramTrackerLists: // an array of references to Graduate Program Tracker List documents
-  jobTrackerLists: // an array of references to Job Tracker List documents
 }
 ```
 An Example Graduate Program Tracker List:
@@ -120,4 +119,4 @@ An Example Graduate Program Tracker:
 
 1. [passport.js authentication docs](https://www.passportjs.org/tutorials/password/)
 2. [Nodemailer](https://www.nodemailer.com/about/)
-3. [Bootstrap] (https://getbootstrap.com/)
+3. [Bootstrap](https://getbootstrap.com/)
