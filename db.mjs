@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
+import mongooseSlugPlugin from 'mongoose-slug-plugin';
+
+mongoose.connect(process.env.DSN);
 
 // User model
 const User = new mongoose.Schema({
   // maybe username, hash, email could be addressed by plugin
   username: { type: String, required: true },
   hash: { type: String, required: true }, 
-  email: { type: String, required: true }, 
+  email: { type: String, required: false }, 
   graduateProgramTrackerLists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTrackerList'}],
 });
 
@@ -33,5 +36,3 @@ const GraduateProgramTracker = new mongoose.Schema({
 mongoose.model('User', User);
 mongoose.model('GraduateProgramTrackerList', GraduateProgramTrackerList);
 mongoose.model('GraduateProgramTracker', GraduateProgramTracker);
-
-// TODO: Add the rest of your database setup here (e.g., connection setup, model registration, etc.)

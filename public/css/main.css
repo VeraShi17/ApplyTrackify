@@ -1,0 +1,13 @@
+.form-group,
+.btn,
+.form-control {
+  margin-bottom: 1rem; 
+  margin-top: 0.5rem;
+}
+
+#main-title {
+    text-align: center;
+    font-family: fantasy;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}

@@ -110,7 +110,7 @@ An Example Graduate Program Tracker:
     * I think it's a challenging library to learn, so I've assigned it 5 points.
     * Possible candidate modules or solutions: nodemailer as the primary module for email sending functionality.
 
-11 points total out of 10 required points 
+12 points total out of 10 required points 
 
 
 ## [Link to Initial Main Project File](app.mjs) 
