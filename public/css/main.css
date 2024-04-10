@@ -11,3 +11,32 @@
     margin-top: 3rem;
     margin-bottom: 3rem;
 }
+
+.login-status {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
+
+.list-group-item a {
+    margin: 0 auto; 
+    width: fit-content; 
+}
+
+.list-group-item .form-control {
+    width: 300px; 
+    /* max-width: 500px; */
+}
+
+#creater {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    width: 100%; 
+}
+
+.list-group-item form .form-control,
+.list-group-item form button[type="submit"] {
+    vertical-align: middle;
+    margin: auto;
+    margin-right: 5px;
+}

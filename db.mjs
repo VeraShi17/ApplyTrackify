@@ -17,7 +17,7 @@ const GraduateProgramTrackerList = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
   graduateTrackers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTracker'}]
-});
+}, { timestamps: true });
 
 // Graduate Program Tracker model
 const GraduateProgramTracker = new mongoose.Schema({
@@ -30,7 +30,10 @@ const GraduateProgramTracker = new mongoose.Schema({
   url: { type: String, required: true },
   requirements: { type: String, required: true },
   memo: String,
-});
+}, { timestamps: true });
+
+User.plugin(mongooseSlugPlugin, {tmpl: '<%=username%>'});
+GraduateProgramTrackerList.plugin(mongooseSlugPlugin, {tmpl: '<%=name%>'});
 
 // Register the models
 mongoose.model('User', User);
