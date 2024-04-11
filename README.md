@@ -66,6 +66,7 @@ An Example Graduate Program Tracker:
 ![dashboard](documentation/dashboard.jpg)
 
 /dashboard/create - page for creating a new tracker list
+[04/10: delete this page]
 ![create-list](documentation/create-list.jpg)
 
 /dashboard/slug-for-list - page for showing specific tracker list
@@ -78,7 +79,7 @@ An Example Graduate Program Tracker:
 ![create-tracker](documentation/create-tracker.jpg)
 
 ## Site map
-
+[04/10: remove the path from register page to email verification page (may add the email verification functionality to dashboard later)]
 ![site-map](documentation/site-map.jpg)
 
 ## User Stories or Use Cases
