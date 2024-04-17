@@ -1,0 +1,78 @@
+<h1 class="mb-4">Edit Tracker for {{list.name}}</h1>
+<form id="trackerForm" action="/dashboard/{{listSlug}}/{{tracker._id}}/update-tracker" method="POST">
+  <div class="mb-3">
+    <label for="university" class="form-label">University:</label>
+    <input type="text" class="form-control" id="university" name="university" value="{{tracker.university}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="program" class="form-label">Program:</label>
+    <input type="text" class="form-control" id="program" name="program" value="{{tracker.program}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="deadline" class="form-label">Deadline:</label>
+    <input type="date" class="form-control" id="deadline" name="deadline" value="{{tracker.deadline}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="submissionStatus" class="form-label">Submission Status:</label>
+    <input type="text" class="form-control" id="submissionStatus" name="submissionStatus" value="{{tracker.submissionStatus}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="applicationStatus" class="form-label">Application Status:</label>
+    <input type="text" class="form-control" id="applicationStatus" name="applicationStatus" value="{{tracker.applicationStatus}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="url" class="form-label">URL:</label>
+    <input type="url" class="form-control" id="url" name="url" value="{{tracker.url}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="requirements" class="form-label">Requirements:</label>
+    <textarea class="form-control" id="requirements" name="requirements" required>{{tracker.requirements}}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="memo" class="form-label">Memo:</label>
+    <textarea class="form-control" id="memo" name="memo">{{tracker.memo}}</textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Tracker</button>
+</form>
+
+<script>
+document.getElementById('trackerForm').addEventListener('submit', function(event) {
+  var isValid = true;
+  var inputs = this.querySelectorAll('[required]');
+  
+  inputs.forEach(function(input) {
+    if (!input.value.trim()) {
+      isValid = false;
+      input.classList.add('is-invalid');
+    } else {
+      input.classList.remove('is-invalid');
+    }
+  });
+
+  if (!isValid) {
+    event.preventDefault(); 
+    alert('Please fill in all required fields.');
+  }
+});
+
+document.querySelectorAll('[required]').forEach(function(input) {
+  input.addEventListener('input', function() {
+    if (this.value.trim()) {
+      this.classList.remove('is-invalid');
+    }
+  });
+});
+</script>
+<style>
+.is-invalid {
+  border: 1px solid red;
+}
+</style>

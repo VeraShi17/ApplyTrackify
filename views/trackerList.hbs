@@ -1,4 +1,48 @@
-Here's the list!
+<h1 class="mb-4">{{list.name}}</h1>
+
+<table class="table table-hover table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>University</th>
+      <th>Program</th>
+      <th>Deadline</th>
+      <th>Submission Status</th>
+      <th>Application Status</th>
+      <th>URL</th>
+      <th>Requirements</th>
+      <th>Memo</th>
+      <th>Edit</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each trackers}}
+    <tr>
+      <td>{{this.university}}</td>
+      <td>{{this.program}}</td>
+      <td>{{this.deadline}}</td>
+      <td>{{this.submissionStatus}}</td>
+      <td>{{this.applicationStatus}}</td>
+      <td><a href="{{this.url}}" target="_blank">Link</a></td>
+      <td>{{this.requirements}}</td>
+      <td>{{this.memo}}</td>
+      <td>
+        <a href="/dashboard/{{../list.slug}}/{{this._id}}/edit" class="btn btn-warning">Edit</a>
+      </td>
+      <td>
+        <form action="/dashboard/{{../list.slug}}/{{this._id}}/delete-tracker" method="POST" onsubmit="return confirm('Are you sure you want to delete this tracker?');">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<form action="/dashboard/{{list.slug}}/create-tracker" method="GET" class="mb-3">
+    <button class="btn btn-primary" type="submit">Add New Tracker</button>
+</form>
+
 <form action="/dashboard" method="GET">
     <button class="btn btn-secondary" type="submit">Home</button>
 </form>

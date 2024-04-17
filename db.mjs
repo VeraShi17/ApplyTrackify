@@ -24,7 +24,7 @@ const GraduateProgramTracker = new mongoose.Schema({
   graduateTrackerList: { type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTrackerList', required: true },
   university: { type: String, required: true },
   program: { type: String, required: true },
-  deadline: { type: Date, required: true },
+  deadline: { type: String, required: true },
   submissionStatus: { type: String, required: true },
   applicationStatus: { type: String, required: true },
   url: { type: String, required: true },

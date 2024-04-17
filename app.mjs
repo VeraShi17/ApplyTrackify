@@ -2,6 +2,7 @@ import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url';
 import session from 'express-session';
+import moment from 'moment'; 
 
 import './config.mjs';
 import './db.mjs';
@@ -18,6 +19,7 @@ const registrationMessages = {"USERNAME ALREADY EXISTS": "Username already exist
 const authRequiredPaths = ['/dashboard'];
 
 const GraduateProgramTrackerList = mongoose.model('GraduateProgramTrackerList');
+const GraduateProgramTracker = mongoose.model('GraduateProgramTracker');
 
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
@@ -97,11 +99,14 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/dashboard', async (req, res) => {
-  const graduateProgramTrackerLists = await GraduateProgramTrackerList.find({}).sort('-createdAt').exec();
+  const graduateProgramTrackerLists = await GraduateProgramTrackerList.find({
+    user: req.session.user._id 
+  }).sort('-createdAt').exec();
+
   res.render('dashboard', {user: req.session.user, lists: graduateProgramTrackerLists});
 });
 
-app.post('/create-list', async (req, res) => {
+app.post('/dashboard/create-list', async (req, res) => {
   const { listName } = req.body;
   try {
     const existingList = await GraduateProgramTrackerList.findOne({ name: listName, user: req.session.user._id });
@@ -128,7 +133,10 @@ app.post('/create-list', async (req, res) => {
 app.get('/dashboard/:slug', async (req, res) => {
   try {
     const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug })
-                                  .populate('user')
+                                  .populate({
+                                    path: 'graduateTrackers',  
+                                    model: 'GraduateProgramTracker'
+                                  })
                                   .exec();
 
     if (!list) {
@@ -136,7 +144,8 @@ app.get('/dashboard/:slug', async (req, res) => {
     }
 
     res.render('trackerList', {
-
+      list: list, 
+      trackers: list.graduateTrackers
     });
   } catch (err) {
     console.error(err);
@@ -144,10 +153,13 @@ app.get('/dashboard/:slug', async (req, res) => {
   }
 });
 
-app.post('/delete-list', async (req, res) => {
+app.post('/dashboard/delete-list', async (req, res) => {
   try {
     const { slug } = req.body;
-    await GraduateProgramTrackerList.findOneAndDelete({ slug });
+    await GraduateProgramTrackerList.findOneAndDelete({
+      slug,
+      user: req.session.user._id
+    });
     res.redirect('/dashboard');
   } catch (error) {
     console.error('Error deleting list:', error);
@@ -155,29 +167,145 @@ app.post('/delete-list', async (req, res) => {
   }
 });
 
-app.post('/rename-list', async (req, res) => {
+app.post('/dashboard/rename-list', async (req, res) => {
   const { slug, newName } = req.body;
-  console.log('body:',req.body);
+  // console.log('body:',req.body);
 
   try {
-    const updatedList = await GraduateProgramTrackerList.findOneAndUpdate(
-      { slug }, 
-      { name: newName }, 
-      { new: true } // return the new one
-    );
+    const updatedList = await GraduateProgramTrackerList.findOneAndUpdate({
+      slug,
+      user: req.session.user._id
+    }, {
+      name: newName
+    }, {
+      new: true
+    });
 
     if (updatedList) {
       res.status(200).send('List renamed successfully');
-      console.log('List renamed successfully');
     } else {
-      console.log('no list');
       res.status(404).send('List not found');
-      
     }
   } catch (error) {
-    console.log('error');
     console.error('Error renaming list:', error);
     res.status(500).send('Error renaming the list');
+  }
+});
+
+app.get('/dashboard/:slug/create-tracker', async (req, res) => {
+  try {
+    const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug });
+
+    if (!list) {
+      return res.status(404).send('List not found');
+    }
+    res.render('createTracker', {
+      list: list 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+app.post('/dashboard/:slug/create-tracker', async (req, res) => {
+  try {
+    const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
+
+    const formattedDeadline = moment(deadline).format('YYYY-MM-DD');
+
+    const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug });
+    if (!list) {
+      return res.status(404).send("List not found");
+    }
+
+    const tracker = new GraduateProgramTracker({
+      graduateTrackerList: list._id, 
+      university,
+      program,
+      deadline: formattedDeadline,
+      submissionStatus,
+      applicationStatus,
+      url,
+      requirements,
+      memo
+    });
+    await tracker.save();
+
+    list.graduateTrackers.push(tracker._id);
+    await list.save();
+
+    res.redirect(`/dashboard/${req.params.slug}`);
+  } catch (error) {
+    console.error('Failed to create tracker:', error);
+    res.status(500).render('createTracker', {
+      list,
+      error: 'Failed to create tracker due to server error.'
+    });
+  }
+});
+
+
+app.post('/dashboard/:listSlug/:trackerId/delete-tracker', async (req, res) => {
+  try {
+    await GraduateProgramTracker.findByIdAndDelete(req.params.trackerId);
+    res.redirect(`/dashboard/${req.params.listSlug}`);
+  } catch (error) {
+    console.error('Failed to delete the tracker:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+app.get('/dashboard/:listSlug/:trackerId/edit', async (req, res) => {
+  try {
+    const tracker = await GraduateProgramTracker.findById(req.params.trackerId).exec();
+    if (!tracker) {
+      return res.status(404).send('Tracker not found');
+    }
+
+    res.render('trackerEdit', {
+      listSlug: req.params.listSlug, 
+      tracker: tracker
+    });
+  } catch (error) {
+    console.error('Error retrieving the tracker:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+app.post('/dashboard/:listSlug/:trackerId/update-tracker', async (req, res) => {
+  const { listSlug, trackerId } = req.params;
+  const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
+
+  try {
+    const formattedDeadline = moment(deadline).format('YYYY-MM-DD'); // Format the date
+
+    // Update the tracker
+    const updatedTracker = await GraduateProgramTracker.findByIdAndUpdate(trackerId, {
+      university,
+      program,
+      deadline: formattedDeadline,
+      submissionStatus,
+      applicationStatus,
+      url,
+      requirements,
+      memo
+    }, { new: true }); // Option {new: true} will return the updated object
+
+    if (!updatedTracker) {
+      return res.status(404).send("Tracker not found");
+    }
+
+    // No need to push to graduateTrackers array because the tracker already exists
+    res.redirect(`/dashboard/${listSlug}`);
+  } catch (error) {
+    console.error('Failed to update tracker:', error);
+    // If there's an error during the update, you might want to render an edit page again with an error message
+    res.status(500).render('trackerEdit', {
+      error: 'Failed to update tracker due to server error.',
+      tracker: { _id: trackerId, university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo },
+      listSlug
+    });
   }
 });
 

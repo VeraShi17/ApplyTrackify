@@ -6,7 +6,7 @@
         {{!-- <button class="btn btn-primary" type="button">Rename</button> --}}
         <button class="btn btn-primary" onclick="renameList('{{list.slug}}')">Rename</button>
         <!-- Delete Form -->
-        <form action="/delete-list" method="POST" onsubmit="return confirm('Are you sure?');">
+        <form action="/dashboard/delete-list" method="POST" onsubmit="return confirm('Are you sure?');">
             <input type="hidden" name="slug" value="{{list.slug}}">
             <button class="btn btn-secondary" type="submit">Delete</button>
         </form>
@@ -14,7 +14,7 @@
     </div>
   {{/each}}
   <div class="list-group-item" id="creater">
-    <form action="/create-list" method="POST" class="d-flex justify-content-between align-items-center">
+    <form action="/dashboard/create-list" method="POST" class="d-flex justify-content-between align-items-center">
       <input type="text" name="listName" class="form-control" placeholder="List name" aria-label="List name">
       <button type="submit" class="btn btn-primary">Create a new list</button>
     </form>
@@ -25,7 +25,7 @@
 function renameList(slug) {
   const newName = prompt("Please enter the new name for the list:");
   if (newName) {
-    fetch('/rename-list', {
+    fetch('/dashboard/rename-list', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
