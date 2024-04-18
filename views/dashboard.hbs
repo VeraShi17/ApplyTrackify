@@ -1,3 +1,41 @@
+<div class="accordion" id="dashboardAccordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingToday">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
+        Today's Deadlines
+      </button>
+    </h2>
+    <div id="collapseToday" class="accordion-collapse collapse show" aria-labelledby="headingToday">
+      <div class="accordion-body">
+        {{#each todayTrackers}}
+          <p>{{this.university}} - {{this.program}} - <a href="/dashboard/{{this.graduateTrackerList.slug}}">{{this.graduateTrackerList.name}}</a></p>
+        {{/each}}
+        {{#unless todayTrackers.length}}
+          <p>No trackers due today.</p>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingRecent">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRecent" aria-expanded="false" aria-controls="collapseRecent">
+        Recent Deadlines
+      </button>
+    </h2>
+    <div id="collapseRecent" class="accordion-collapse collapse" aria-labelledby="headingRecent">
+      <div class="accordion-body">
+        {{#each recentTrackers}}
+          <p>{{this.university}} - {{this.program}} - <a href="/dashboard/{{this.graduateTrackerList.slug}}">{{this.graduateTrackerList.name}}</a> - {{this.deadline}}</p>
+        {{/each}}
+        {{#unless recentTrackers.length}}
+          <p>No recent trackers found.</p>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="list-group">
   {{#each lists as |list|}}
     <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">

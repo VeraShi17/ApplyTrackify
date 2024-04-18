@@ -37,15 +37,13 @@ app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-  if(authRequiredPaths.includes(req.path)) {
-    if(!req.session.user) {
-      res.redirect('/login'); 
-    } else {
-      next(); 
+  const basePath = req.path.split('/')[1];  
+  if (authRequiredPaths.includes(`/${basePath}`)) {
+    if (!req.session.user) {
+      return res.redirect('/login');
     }
-  } else {
-    next(); 
   }
+  next();
 });
 
 app.use((req, res, next) => {
@@ -99,12 +97,59 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/dashboard', async (req, res) => {
-  const graduateProgramTrackerLists = await GraduateProgramTrackerList.find({
-    user: req.session.user._id 
-  }).sort('-createdAt').exec();
+  try {
+      const today = moment().startOf('day');
+      const tomorrow = moment(today).add(1, 'days');
 
-  res.render('dashboard', {user: req.session.user, lists: graduateProgramTrackerLists});
+      const graduateProgramTrackerLists = await GraduateProgramTrackerList.find({
+        user: req.session.user._id 
+      }).sort('-createdAt').exec();
+
+      // Find trackers with today's deadline
+      const todayTrackers = await GraduateProgramTracker.find({
+          user: req.session.user._id,
+          deadline: {
+              $gte: today.toDate(),
+              $lt: tomorrow.toDate()
+          }
+      }).populate('graduateTrackerList').exec();
+
+      // Format trackers for display
+      const formattedTodayTrackers = todayTrackers.map(tracker => ({
+          ...tracker._doc,
+          deadline: moment(tracker.deadline).format('YYYY-MM-DD'),
+          university: tracker.university,
+          program: tracker.program,
+          link: `/dashboard/${tracker.graduateTrackerList.slug}`
+      }));
+
+      // Find recent trackers excluding today
+      const recentTrackers = await GraduateProgramTracker.find({
+        user: req.session.user._id,
+        deadline: { $gte: today.toDate() }  
+    }).sort({ deadline: 1 }).limit(10).populate('graduateTrackerList').exec();
+
+      // Format these as well
+      const formattedRecentTrackers = recentTrackers.map(tracker => ({
+          ...tracker._doc,
+          deadline: moment(tracker.deadline).format('YYYY-MM-DD'),
+          university: tracker.university,
+          program: tracker.program,
+          link: `/dashboard/${tracker.graduateTrackerList.slug}`
+      }));
+
+      res.render('dashboard', {
+          user: req.session.user,
+          lists: graduateProgramTrackerLists,
+          todayTrackers: formattedTodayTrackers,
+          recentTrackers: formattedRecentTrackers
+      });
+  } catch (error) {
+      console.error('Dashboard loading failed:', error);
+      res.status(500).send('Server error');
+  }
 });
+
 
 app.post('/dashboard/create-list', async (req, res) => {
   const { listName } = req.body;
@@ -143,9 +188,14 @@ app.get('/dashboard/:slug', async (req, res) => {
       return res.status(404).send('List not found');
     }
 
+    const trackersWithFormattedDates = list.graduateTrackers.map(tracker => ({
+      ...tracker.toObject(), 
+      deadline: moment(tracker.deadline).format('YYYY-MM-DD') 
+    }));
+
     res.render('trackerList', {
-      list: list, 
-      trackers: list.graduateTrackers
+      list: list,
+      trackers: trackersWithFormattedDates
     });
   } catch (err) {
     console.error(err);
@@ -212,7 +262,7 @@ app.post('/dashboard/:slug/create-tracker', async (req, res) => {
   try {
     const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
 
-    const formattedDeadline = moment(deadline).format('YYYY-MM-DD');
+    const formattedDeadline = moment(deadline, 'YYYY-MM-DD').toDate();
 
     const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug });
     if (!list) {
@@ -220,6 +270,7 @@ app.post('/dashboard/:slug/create-tracker', async (req, res) => {
     }
 
     const tracker = new GraduateProgramTracker({
+      user: req.session.user._id,
       graduateTrackerList: list._id, 
       university,
       program,
@@ -278,10 +329,10 @@ app.post('/dashboard/:listSlug/:trackerId/update-tracker', async (req, res) => {
   const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
 
   try {
-    const formattedDeadline = moment(deadline).format('YYYY-MM-DD'); // Format the date
+    const formattedDeadline = moment(deadline, 'YYYY-MM-DD').toDate();
 
-    // Update the tracker
-    const updatedTracker = await GraduateProgramTracker.findByIdAndUpdate(trackerId, {
+    const updatedTracker = await GraduateProgramTracker.findByIdAndUpdate(
+      {_id: trackerId, user: req.session.userId}, {
       university,
       program,
       deadline: formattedDeadline,
@@ -290,17 +341,15 @@ app.post('/dashboard/:listSlug/:trackerId/update-tracker', async (req, res) => {
       url,
       requirements,
       memo
-    }, { new: true }); // Option {new: true} will return the updated object
+    }, { new: true }); 
 
     if (!updatedTracker) {
       return res.status(404).send("Tracker not found");
     }
 
-    // No need to push to graduateTrackers array because the tracker already exists
     res.redirect(`/dashboard/${listSlug}`);
   } catch (error) {
     console.error('Failed to update tracker:', error);
-    // If there's an error during the update, you might want to render an edit page again with an error message
     res.status(500).render('trackerEdit', {
       error: 'Failed to update tracker due to server error.',
       tracker: { _id: trackerId, university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo },

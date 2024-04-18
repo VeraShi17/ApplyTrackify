@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
-import mongooseSlugPlugin from 'mongoose-slug-plugin';
+// import mongooseSlugPlugin from 'mongoose-slug-plugin';
+import slug from 'mongoose-slug-updater';
+
+mongoose.plugin(slug);
 
 mongoose.connect(process.env.DSN);
 
@@ -16,15 +19,17 @@ const User = new mongoose.Schema({
 const GraduateProgramTrackerList = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
-  graduateTrackers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTracker'}]
+  graduateTrackers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTracker'}],
+  slug: { type: String, slug: "name", unique: true, slugPaddingSize: 4 }
 }, { timestamps: true });
 
 // Graduate Program Tracker model
 const GraduateProgramTracker = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   graduateTrackerList: { type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTrackerList', required: true },
   university: { type: String, required: true },
   program: { type: String, required: true },
-  deadline: { type: String, required: true },
+  deadline: { type: Date, required: true },
   submissionStatus: { type: String, required: true },
   applicationStatus: { type: String, required: true },
   url: { type: String, required: true },
@@ -32,8 +37,8 @@ const GraduateProgramTracker = new mongoose.Schema({
   memo: String,
 }, { timestamps: true });
 
-User.plugin(mongooseSlugPlugin, {tmpl: '<%=username%>'});
-GraduateProgramTrackerList.plugin(mongooseSlugPlugin, {tmpl: '<%=name%>'});
+// User.plugin(mongooseSlugPlugin, {tmpl: '<%=username%>'});
+// GraduateProgramTrackerList.plugin(mongooseSlugPlugin, {tmpl: '<%=name%>'});
 
 // Register the models
 mongoose.model('User', User);
