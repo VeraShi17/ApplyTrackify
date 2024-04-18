@@ -5,12 +5,23 @@
   margin-top: 0.5rem;
 }
 
-#main-title {
+/* #main-title {
     text-align: center;
     font-family: fantasy;
     margin-top: 3rem;
     margin-bottom: 3rem;
-}
+} */
+.navbar {
+    padding-top: 1rem; 
+    padding-bottom: 1rem; 
+    font-size: 1.5rem; 
+  }
+  
+  .navbar-brand {
+    font-size: 2rem; 
+    font-family: fantasy; 
+  }
+  
 
 .login-status {
     position: absolute;

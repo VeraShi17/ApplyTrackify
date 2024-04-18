@@ -11,7 +11,10 @@
     <link rel="stylesheet" href="/css/main.css">
   </head>
   <body>
-    <h1 id="main-title">ApplyTrackify</h1>
+    {{!-- <h1 id="main-title">ApplyTrackify</h1> --}}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-center">
+      <a class="navbar-brand" href="/dashboard" style="font-family: fantasy;">ApplyTrackify</a>
+    </nav>
     <span class="login-status">{{#if user}}Welcome, {{user.username}}!{{/if}}</span>
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
