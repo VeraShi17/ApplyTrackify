@@ -61,7 +61,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  res.render('login');
+  if (req.session.user) {
+    res.redirect('/dashboard');
+  } else {
+    res.render('login');
+  }
 });
 
 app.post('/login', async (req, res) => {
@@ -79,7 +83,11 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.render('register');
+  if (req.session.user) {
+    res.redirect('/dashboard');
+  } else {
+    res.render('register');
+  }
 });
 
 app.post('/register', async (req, res) => {
