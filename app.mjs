@@ -324,7 +324,7 @@ app.get('/dashboard/:listSlug/:trackerId/edit', async (req, res) => {
   }
 });
 
-app.post('/dashboard/:listSlug/:trackerId/update-tracker', async (req, res) => {
+app.post('/dashboard/:listSlug/:trackerId/edit', async (req, res) => {
   const { listSlug, trackerId } = req.params;
   const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
 
