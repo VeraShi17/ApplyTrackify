@@ -21,6 +21,7 @@ An Example User:
   hash: // a password hash,
   email: "user@example.com", // user email
   graduateProgramTrackerLists: // an array of references to Graduate Program Tracker List documents
+  slug: // using mongoose-slug-updater, slug:name 
 }
 ```
 An Example Graduate Program Tracker List:
@@ -61,10 +62,11 @@ An Example Graduate Program Tracker:
 /register - page for register
 ![register](documentation/register.jpg)
 
-/dashboard/verify-email - page for email verification
-![verify-email](documentation/verify-email.jpg)
+<!-- /dashboard/verify-email - page for email verification
+![verify-email](documentation/verify-email.jpg) -->
 
 /dashboard - the main page that the user can see after logging in, where the user can create new tracker lists and view existing lists
+[add calendar component]
 ![dashboard](documentation/dashboard.jpg)
 
 <!-- /dashboard/create - page for creating a new tracker list
@@ -81,7 +83,7 @@ An Example Graduate Program Tracker:
 ![create-tracker](documentation/create-tracker.jpg)
 
 ## Site map
-[04/10: remove the path from register page to email verification page (may add the email verification functionality to dashboard later), also remove the create-list page]
+[remove verify-email page and create-list page]
 ![site-map](documentation/site-map.jpg)
 
 ## User Stories or Use Cases
@@ -93,7 +95,7 @@ An Example Graduate Program Tracker:
 5. as a user, I can add graduate trackers to an existing graduate tracker list
 6. as a user, I can see the recent deadline in the user's main page
 7. as a user, I can edit or delete each trackers I created
-8. as a user, I can verify my email and receive an email remainder right before the deadline
+8. as a user, I can use calendar compoenent to view all deadlines
 
 ## Research Topics
 
@@ -101,14 +103,22 @@ An Example Graduate Program Tracker:
     * Bootstrap is a popular front-end framework for developing responsive and mobile-first websites.
     * Bootstrap is chosen for its extensive component library and responsive design features, which significantly speed up the development process.
     * Possible candidate modules or solutions: The core Bootstrap framework for CSS and JavaScript components.
-* (6 points) Nodemailer for Email Verification and Reminders
+<!-- * (6 points) Nodemailer for Email Verification and Reminders
     * Nodemailer is a module for Node.js applications to send emails easily. It supports various transport methods, including SMTP, and can be integrated into server-side logic to automate the process of sending emails from within an application.
     * Nodemailer is chosen for its flexibility and ease of use in sending automated emails, such as reminders or notifications, directly from the server. 
     * I think it's a challenging library to learn, so I've assigned it 5 points.
-    * Possible candidate modules or solutions: nodemailer as the primary module for email sending functionality.
+    * Possible candidate modules or solutions: nodemailer as the primary module for email sending functionality. -->
 * (2 points) Moment.js
     * Moment.js is a widely used library in JavaScript that provides a multitude of options for parsing, validating, manipulating, and formatting dates.
     * The choice of Moment.js is based on its robust feature set that simplifies date-related operations, which can often be complex due to the inconsistencies across different locales and time zones.
+* (3 points) SweetAlert
+    * SweetAlert is a versatile and aesthetically pleasing replacement for JavaScript's alert boxes, which allows for more interactive and visually engaging notifications and prompts on web pages.
+    * It is chosen for its ease of integration, customization options, and ability to enhance user interaction without reloading or navigating away from the current page, which improves user experience significantly.
+    * Possible candidate modules or solutions: SweetAlert2 library for enhancing form submissions, confirmations, and alert functionality with custom modal popups.
+* (3 points) FullCalendar
+    * FullCalendar is a powerful and fully-featured JavaScript calendar library that enables the integration of interactive calendars into web applications. It supports events, drag-and-drop, views customization, and interacts seamlessly with different data sources.
+    * This library is selected for its comprehensive API and broad browser compatibility, making it ideal for implementing complex calendar features with minimal setup.
+    * Possible candidate modules or solutions: FullCalendar JavaScript library to display and manage events in a variety of calendar views such as daily, weekly, monthly, or agenda.
 
 10 points total out of 10 required points 
 
@@ -118,6 +128,8 @@ An Example Graduate Program Tracker:
 ## Annotations / References Used
 
 1. [moment.js](https://momentjs.com/)
-2. [Nodemailer](https://www.nodemailer.com/about/)
+<!-- 2. [Nodemailer](https://www.nodemailer.com/about/) -->
+2. [SweetAlert](https://sweetalert2.github.io/)
 3. [Bootstrap](https://getbootstrap.com/)
 4. [Bootstrap theme build](https://bootstrap.build/themes)
+5. [FullCalendar](https://fullcalendar.io/)

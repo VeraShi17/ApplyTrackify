@@ -1,7 +1,7 @@
 <div class="container-login">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <form method="POST" action="login">
+      <form id="loginForm" method="POST" action="login">
         <h3 class="mb-3">Login</h3>
         <div class="form-group">
           <label for="inputUsername">Username</label>
@@ -20,3 +20,46 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+  event.preventDefault(); 
+
+  const formData = new FormData(this);
+  fetch('/login', {
+    method: 'POST',
+    body: new URLSearchParams(formData),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Logged in Successfully',
+        text: 'Redirecting to dashboard...',
+        timer: 1500,
+        didClose: () => window.location.href = '/dashboard'
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: data.message
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred during login.'
+    });
+  });
+});
+</script>

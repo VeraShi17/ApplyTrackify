@@ -75,10 +75,10 @@ app.post('/login', async (req, res) => {
       req.body.password
     );
     await auth.startAuthenticatedSession(req, user);
-    res.redirect('/dashboard'); 
+    res.json({ success: true }); // Send success true
   } catch(err) {
     console.log(err);
-    res.render('login', {message: loginMessages[err.message] ?? 'Login unsuccessful'}); 
+    res.status(401).json({ success: false, message: loginMessages[err.message] ?? 'Login unsuccessful' });
   }
 });
 
@@ -96,11 +96,10 @@ app.post('/register', async (req, res) => {
       sanitize(req.body.username), 
       req.body.password
     );
-    await auth.startAuthenticatedSession(req, newUser);
-    res.redirect('/login'); 
+    res.json({ success: true, message: 'Registration successful. Please login to continue.' });
   } catch(err) {
     console.log(err);
-    res.render('register', {message: registrationMessages[err.message] ?? 'Registration error'}); 
+    res.status(400).json({ success: false, message: registrationMessages[err.message] ?? 'Registration error' });
   }
 });
 
@@ -169,7 +168,6 @@ app.get('/dashboard', async (req, res) => {
   }
 });
 
-
 app.post('/dashboard/create-list', async (req, res) => {
   const { listName } = req.body;
   try {
@@ -191,7 +189,6 @@ app.post('/dashboard/create-list', async (req, res) => {
     res.status(500).json({ message: 'Failed to create the list due to server error.' });
   }
 });
-
 
 app.get('/dashboard/:slug', async (req, res) => {
   try {
@@ -259,7 +256,6 @@ app.post('/dashboard/rename-list', async (req, res) => {
   }
 });
 
-
 app.get('/dashboard/:slug/create-tracker', async (req, res) => {
   try {
     const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug });
@@ -308,8 +304,6 @@ app.post('/dashboard/:slug/create-tracker', async (req, res) => {
     res.status(500).json({ error: 'Failed to create tracker due to server error.' });
   }
 });
-
-
 
 app.post('/dashboard/:listSlug/:trackerId/delete-tracker', async (req, res) => {
   try {
@@ -367,6 +361,5 @@ app.post('/dashboard/:listSlug/:trackerId/edit', async (req, res) => {
     res.status(500).send({ error: 'Failed to update tracker due to server error.' });
   }
 });
-
 
 app.listen(process.env.PORT || 3000);

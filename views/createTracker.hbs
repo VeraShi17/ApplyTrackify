@@ -48,11 +48,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.getElementById('trackerForm').addEventListener('submit', function(event) {
-  event.preventDefault(); // Prevent the form from submitting until validation is complete
+  event.preventDefault(); 
   var isValid = true;
   var inputs = this.querySelectorAll('[required]');
 
-  // Check each required input
   inputs.forEach(function(input) {
     if (!input.value.trim()) {
       isValid = false;
@@ -62,7 +61,6 @@ document.getElementById('trackerForm').addEventListener('submit', function(event
     }
   });
 
-  // If not valid, show SweetAlert
   if (!isValid) {
     Swal.fire({
       icon: 'error',
@@ -72,7 +70,6 @@ document.getElementById('trackerForm').addEventListener('submit', function(event
       confirmButtonText: 'OK'
     });
   } else {
-    // All fields are valid, perform the fetch request
     var formData = new FormData(this);
 
     fetch(this.action, {

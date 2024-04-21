@@ -7,12 +7,12 @@ mongoose.plugin(slug);
 mongoose.connect(process.env.DSN);
 
 // User model
-const User = new mongoose.Schema({
-  // maybe username, hash, email could be addressed by plugin
-  username: { type: String, required: true },
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
   hash: { type: String, required: true }, 
   email: { type: String, required: false }, 
   graduateProgramTrackerLists: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GraduateProgramTrackerList'}],
+  slug: { type: String, required: true, default: function() { return this.username; } }
 });
 
 // Graduate Program Tracker List model
@@ -41,6 +41,6 @@ const GraduateProgramTracker = new mongoose.Schema({
 // GraduateProgramTrackerList.plugin(mongooseSlugPlugin, {tmpl: '<%=name%>'});
 
 // Register the models
-mongoose.model('User', User);
+mongoose.model('User', UserSchema);
 mongoose.model('GraduateProgramTrackerList', GraduateProgramTrackerList);
 mongoose.model('GraduateProgramTracker', GraduateProgramTracker);
