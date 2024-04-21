@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 const loginMessages = {"PASSWORDS DO NOT MATCH": 'Incorrect password', "USER NOT FOUND": 'User doesn\'t exist'};
 const registrationMessages = {"USERNAME ALREADY EXISTS": "Username already exists", "USERNAME PASSWORD TOO SHORT": "Username or password is too short"};
 
-const authRequiredPaths = ['/dashboard'];
+const authRequiredPaths = ['/dashboard','/verify-email'];
 
 const GraduateProgramTrackerList = mongoose.model('GraduateProgramTrackerList');
 const GraduateProgramTracker = mongoose.model('GraduateProgramTracker');
@@ -146,11 +146,22 @@ app.get('/dashboard', async (req, res) => {
           link: `/dashboard/${tracker.graduateTrackerList.slug}`
       }));
 
+      const allTrackers = await GraduateProgramTracker.find({ user: req.session.user._id })
+      .populate('graduateTrackerList')
+      .exec();
+
+      const calendarTrackers = allTrackers.map(tracker => ({
+        ...tracker.toObject(),
+        deadline: moment(tracker.deadline).format('YYYY-MM-DD'),
+        link: `/dashboard/${tracker.graduateTrackerList.slug}`
+      }));
+
       res.render('dashboard', {
           user: req.session.user,
           lists: graduateProgramTrackerLists,
           todayTrackers: formattedTodayTrackers,
-          recentTrackers: formattedRecentTrackers
+          recentTrackers: formattedRecentTrackers,
+          allTrackers: calendarTrackers
       });
   } catch (error) {
       console.error('Dashboard loading failed:', error);
@@ -165,8 +176,7 @@ app.post('/dashboard/create-list', async (req, res) => {
     const existingList = await GraduateProgramTrackerList.findOne({ name: listName, user: req.session.user._id });
     
     if (existingList) {
-      req.session.error = 'List name already exists. Please choose a different name.';
-      return res.redirect('/dashboard');
+      return res.status(400).json({ message: 'List name already exists. Please choose a different name.' });
     }
 
     const newList = new GraduateProgramTrackerList({
@@ -174,11 +184,11 @@ app.post('/dashboard/create-list', async (req, res) => {
       name: listName
     });
     await newList.save();
-    res.redirect(`/dashboard/${newList.slug}`);
+    res.json({ message: 'List created successfully!', slug: newList.slug });
 
   } catch (error) {
     console.error('Error creating new list:', error);
-    res.redirect('/dashboard');
+    res.status(500).json({ message: 'Failed to create the list due to server error.' });
   }
 });
 
@@ -227,7 +237,6 @@ app.post('/dashboard/delete-list', async (req, res) => {
 
 app.post('/dashboard/rename-list', async (req, res) => {
   const { slug, newName } = req.body;
-  // console.log('body:',req.body);
 
   try {
     const updatedList = await GraduateProgramTrackerList.findOneAndUpdate({
@@ -240,15 +249,16 @@ app.post('/dashboard/rename-list', async (req, res) => {
     });
 
     if (updatedList) {
-      res.status(200).send('List renamed successfully');
+      res.status(200).json({ message: 'List renamed successfully' });
     } else {
-      res.status(404).send('List not found');
+      res.status(404).json({ error: 'List not found' });
     }
   } catch (error) {
     console.error('Error renaming list:', error);
-    res.status(500).send('Error renaming the list');
+    res.status(500).json({ error: 'Error renaming the list' });
   }
 });
+
 
 app.get('/dashboard/:slug/create-tracker', async (req, res) => {
   try {
@@ -269,12 +279,10 @@ app.get('/dashboard/:slug/create-tracker', async (req, res) => {
 app.post('/dashboard/:slug/create-tracker', async (req, res) => {
   try {
     const { university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo } = req.body;
-
     const formattedDeadline = moment(deadline, 'YYYY-MM-DD').toDate();
-
     const list = await GraduateProgramTrackerList.findOne({ slug: req.params.slug });
     if (!list) {
-      return res.status(404).send("List not found");
+      return res.status(404).json({ error: 'List not found' });
     }
 
     const tracker = new GraduateProgramTracker({
@@ -294,15 +302,13 @@ app.post('/dashboard/:slug/create-tracker', async (req, res) => {
     list.graduateTrackers.push(tracker._id);
     await list.save();
 
-    res.redirect(`/dashboard/${req.params.slug}`);
+    res.json({ message: 'Tracker added successfully!', slug: req.params.slug });
   } catch (error) {
     console.error('Failed to create tracker:', error);
-    res.status(500).render('createTracker', {
-      list,
-      error: 'Failed to create tracker due to server error.'
-    });
+    res.status(500).json({ error: 'Failed to create tracker due to server error.' });
   }
 });
+
 
 
 app.post('/dashboard/:listSlug/:trackerId/delete-tracker', async (req, res) => {
@@ -352,18 +358,15 @@ app.post('/dashboard/:listSlug/:trackerId/edit', async (req, res) => {
     }, { new: true }); 
 
     if (!updatedTracker) {
-      return res.status(404).send("Tracker not found");
+      res.status(404).send({ error: "Tracker not found" });
+    } else {
+      res.send({ message: "Tracker updated successfully!", slug: listSlug });
     }
-
-    res.redirect(`/dashboard/${listSlug}`);
   } catch (error) {
     console.error('Failed to update tracker:', error);
-    res.status(500).render('trackerEdit', {
-      error: 'Failed to update tracker due to server error.',
-      tracker: { _id: trackerId, university, program, deadline, submissionStatus, applicationStatus, url, requirements, memo },
-      listSlug
-    });
+    res.status(500).send({ error: 'Failed to update tracker due to server error.' });
   }
 });
+
 
 app.listen(process.env.PORT || 3000);
